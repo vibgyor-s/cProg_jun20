@@ -175,7 +175,7 @@ int main(void){
     struct tm *timeptr,tm1, tm2;
     char* time1 = "5/23/2020 11:51:20 AM";
     //char* time2 = "tuesday 6/2/2020 10:20:05 AM";
-    time(&t2);//TODO
+    time(&t2);  //TODO
     //(1) convert `String to tm`:  
     if(strptime(time1, "%m/%d/%Y %r",&tm1) == NULL)
             printf("\nstrptime failed\n");          

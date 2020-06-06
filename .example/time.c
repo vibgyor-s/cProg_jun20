@@ -4,12 +4,12 @@
 
 int main()
 {
-    char todayDateStr[100];
+    char todayDateStr[15];
     time_t rawtime;
     struct tm *timeinfo;
 
     time(&rawtime);
     timeinfo = localtime(&rawtime);
-    strftime(todayDateStr, strlen("DD-MMM-YYYY HH:MM") + 1, "%d-%b-%Y %H:%M", timeinfo);
+    strftime(todayDateStr, strlen("DD-MMM-YYYY") + 1, "%d-%b-%Y", timeinfo);
     printf("todayDateStr = %s ... \n", todayDateStr);
 }
