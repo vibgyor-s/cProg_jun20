@@ -729,9 +729,11 @@ void editbooks(void) //edit information about book
                             scanf("%d", &a.rackno);
                             gotoxy(15, 14);
                             printf("The record is modified");
+
                             fseek(fp, ftell(fp) - sizeof(a), 0);
                             fwrite(&a, sizeof(a), 1, fp);
                             fclose(fp);
+                            
                             c = 1;
                      }
                      if (c == 0)
