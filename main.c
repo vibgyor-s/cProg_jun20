@@ -19,7 +19,7 @@ typedef struct  //MAIN1
 typedef struct  //supports user 
 {
     char type;  //issued-i reserved-r
-    char accession[7];
+    int accession;
     time_t issue;
 }bkRec;
 
@@ -122,6 +122,15 @@ int mainAdminMenu(void)
     printf("Hi admin\n");
     printf("Enter 1 for inventory search:\nEnter 2 to place order/ILDRS\n");
     printf("Enter 3 to add/remove Books\nEnter 4 to add/remove Users\nEnter 7 to logout\n\n");
+    int choice;
+    scanf("%d",&choice);
+    switch(choice)
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    default:
+
 }
     void addRemoveBooks(void)
     {
@@ -220,6 +229,13 @@ int mainAdminMenu(void)
             scanf(" %[^\n]",tmpUser1.username);
             printf("Password: ");
             scanf(" %[^\n]",tmpUser1.password);
+            
+            for(int i=0;i<4;i++)
+                {
+                    tmpUser1.record[i].accession = 0;
+                    tmpUser1.record[i].type = 'n';
+                    tmpUser1.record[i].issue = rawtime;
+                }
             ////
             FILE *fp;
             fp = fopen("userMaster.txt", "r+");
@@ -346,7 +362,7 @@ int mainAdminMenu(void)
         mainAdminMenu();
     }
 
-    void order (void)       //TODO MAKE THE TXT FILE READABLE
+    void order (void)       //TODO: MAKE THE TXT FILE READABLE
     {
         printf("Book order/request menu:\n\n");
         printf("Enter 1 to place vendor order\nEnter 2 to request book ILDRS\nEnter 7 to go back\n");
@@ -375,8 +391,7 @@ int mainAdminMenu(void)
         }
 
         while(choice == 2 && flag==2)
-        {
-            while(choice == 1 && flag==1)   //flags to repeat
+        
         {
             printf("ILDRS order:\n\n");
             FILE * fp;
@@ -404,11 +419,75 @@ int mainAdminMenu(void)
 
 int mainUserMenu(void)
 {
-    printf("Hi %s\n");
-    printf("These books are due:\n");    // red colour overdue
-    printf("These books are reserved:\n");  //green colour avaliable to issue
+    printf("Hi %s\n\n",username);
+    user tmpUser;
+    book tmpBook;
+    FILE *fp;
 
+    char issueDate[15];
+    struct tm *issueTime;
+
+
+    fp = fopen("userMaster.txt","r+");
+
+
+    printf("These books are due:\n");    // red colour overdue
+    while(fread(&tmpUser,sizeof(tmpUser),1,fp))
+    {
+        if(!(strcmp(tmpUser.username,username)))
+        {
+            for(int i=0;i<4;i++)
+            {
+                if ((tmpUser.record[i].accession !=0) && tmpUser.record[i].type = 'i')
+                    {
+                        issueTime = localtime(&tmpUser.record[i].issue);
+                        strftime(issueDate, strlen("DD-MMM-YYYY") + 1, "%d-%b-%Y", issueTime);
+                        
+                        if(7 >= (difftime(rawtime,tmpUser.record[i].issue) / 86400)))   //for red colour
+                            printf("");//red colour
+                        printf("    %d - %s",tmpUser.record[i].accession,issueDate);
+                    } 
+            }
+        }
+    }
+    rewind(fp);
+
+    FILE * fs;
+    fs=fopen("bookMaster.txt","r+");
+    
+    printf("These books are reserved:\n");  //green colour avaliable to issue
+    while(fread(&tmpUser,sizeof(tmpUser),1,fp))
+    {
+        if(!(strcmp(tmpUser.username,username)))
+        {
+            for(int i=0;i<4;i++)
+            {
+                if ((tmpUser.record[i].accession !=0) && tmpUser.record[i].type = 'r')
+                    {
+                        int countBook;
+                        rewind(fs);
+                        while(fread(&tmpBook,sizeof(tmpBook),1,fs))
+                        {
+                            if(tmpUser.record[i].accession == tmpBook.accession)
+                                countBook = tmpBook.countAva;
+                        }
+                        
+                        if(countBook>0)   //for red colour
+                            printf("");//green colour
+                        printf("    %d - %s",tmpUser.record[i].accession,issueDate);
+                    } 
+            }
+        }
+    }
+    
+    
+    while(fread(&tmpUser,sizeof(tmpUser),1,fp))
+    {
+
+    }
     printf("Enter 1 to search for a book:\nEnter 2 to issue/return\nEnter 7 to logout\n\n");
+    int choice;
+    scanf("%d",&choice);
 
 }
 
@@ -439,14 +518,169 @@ int mainUserMenu(void)
     void bookManagement(void)
     {
         printf("Book issue/return and reserve/unreserve Menu:\n\n");
-        printf("Enter 1 to issue/reserve book\nEnter 2 to return/unreserve book\nEnter 7 to go back\n")
+        printf("Enter 1 to issue/reserve book\nEnter 2 to return/unreserve book\nEnter 7 to go back\n");
+        int choice, flag=1;
         scanf("%d",&choice);
+
+        while(choice ==1 && flag ==1)
+        {
+            printf("Issue / Reserve Menu:\n\n");
+            printf("Enter accession no.: ");
+            int accNo;
+            scanf("%d",&accNo);
+
+            FILE *fp;
+            fp = fopen("bookMaster.txt","r+");
+
+            FILE *fs;
+            fs = fopen("userMaster.txt","r+");
+
+            int arrayPos = 0, avaFlag=0, bookFlag =1;
+            char choice;
+
+            book tmpBook;
+            while(fread(&tmpBook,sizeof(tmpBook),1,fp))
+            {
+                if(accNo == tmpBook.accession)
+                {
+                    if(tmpBook.countAva>0)
+                        {
+                            printf("Book avaliable. Issue? ");
+                            scanf("%c",&choice);
+
+                        } 
+                    else 
+                    {
+                        printf("Book not avaliable. Reserve? ");
+                        scanf("%c",&choice);
+
+                        bookFlag=0;
+                    }
+                }
+            }
+            user tmpUser;
+            while(fread(&tmpUser,sizeof(tmpUser),1,fs))
+            {
+                if(!(strcmp(username,tmpUser.username)))
+                {
+                    for(int i=0;i<5;i++) 
+                    {
+                        if(tmpUser.record[i].accession = 0)
+                            {
+                                avaFlag =1;
+                                break;
+                            }
+                        arrayPos+=1;
+                    }
+                    break;
+                }
+                
+            }
+
+            rewind(fp);
+            rewind(fs);
+            if (choice=='y' && avaFlag ==1)
+            {
+                while (fread(&tmpBook, sizeof(tmpBook), 1, fp) == 1)
+                {
+                    if (tmpBook.accession==accNo)
+                    {
+                        if(tmpBook.countAva>0)
+                            {
+                                tmpBook.countAva--;
+                                fseek(fp, ftell(fp) - sizeof(tmpBook), 0);
+                                fwrite(&tmpBook, sizeof(tmpBook), 1, fp);
+                            }
+                    }       
+                } 
+
+                while (fread(&tmpUser, sizeof(tmpUser), 1, fp) == 1)
+                {
+                    if(!(strcmp(tmpUser.username,username)))
+                    {
+                        tmpUser.record[arrayPos].accession=accNo;
+                        tmpUser.record[arrayPos].issue=rawtime;
+                        if(bookFlag)
+                            tmpUser.record[arrayPos].type='i';
+                        else tmpUser.record[arrayPos].type='r';
+
+                        fseek(fp, ftell(fp) - sizeof(tmpUser), 0);
+                        fwrite(&tmpUser, sizeof(tmpUser), 1, fp);
+                    }
+                }                
+
+            }
+        
+            ////
+            printf("Enter 1 to continue: ");
+            scanf("%d",&flag);
+        }
 
         // fseek(fp, ftell(fp) - sizeof(tmpUser2), 0);     //TODO: NOTE
         // fwrite(&tmpUser1, sizeof(tmpUser2), 1, fp);     //EDIT STRUCT USING THIS
 
-    }
+        while(choice ==2 && flag ==1)
+        {
+            printf("Enter accession no.: ");
+            int accNo;
+            scanf("%d",&accNo);
 
+            FILE *fp;
+            fp = fopen("bookMaster.txt","r+");
+
+            FILE *fs;
+            fs = fopen("userMaster.txt","r+");
+
+            int arrayPos = 0, avaFlag=0, bookFlag =1;
+            char choice;
+            
+            user tmpUser;
+            while(fread(&tmpUser,sizeof(tmpUser),1,fs))
+            {
+                if(!(strcmp(username,tmpUser.username)))
+                {
+                    for(int i=0;i<5;i++) 
+                    {
+                        if(tmpUser.record[i].accession = accNo)
+                            {
+                                tmpUser.record[i].accession=0;
+                                tmpUser.record[i].type='n';
+                                tmpUser.record[i].issue = rawtime;
+                                
+                                fseek(fp, ftell(fp) - sizeof(tmpUser), 0);
+                                fwrite(&tmpUser, sizeof(tmpUser), 1, fp);
+
+                                avaFlag =1;
+                                break;
+                            }
+                        //arrayPos+=1;
+                    }
+                }
+                
+            }
+            
+            book tmpBook;
+            while(fread(&tmpBook,sizeof(tmpBook),1,fp))
+            {
+                if(accNo == tmpBook.accession && avaFlag ==1)
+                {
+                    tmpBook.countAva++;
+                    //bookFlag=0;
+                    
+                    fseek(fp, ftell(fp) - sizeof(tmpBook), 0);
+                    fwrite(&tmpBook, sizeof(tmpBook), 1, fp);
+                }
+            }
+
+            fclose(fp);
+            fclose(fs);            
+
+
+
+        }   
+    
+        mainUserMenu();
+    }
     //////////////
     //Supporting macros
     int latestAccessionNo(void)
