@@ -262,7 +262,7 @@ int mainAdminMenu(void)
             ////
             
             FILE *fs;
-            fs = fopen("UserMaster.txt", "a+");
+            fs = fopen("userMaster.txt", "a+");
             fwrite(&tmpUser1, sizeof(tmpUser1), 1, fs);
             fclose(fp);
             printf("Saved successfully.\n");
