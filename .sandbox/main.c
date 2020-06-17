@@ -354,9 +354,11 @@ void inventory(void)
         book tmpBook;
         while (fread(&tmpBook, sizeof(tmpBook), 1, fp) == 1)
         {
-            printf("    %d %s\n        by %s    Total Count= %d\n\n", tmpBook.accession, tmpBook.title, tmpBook.author, tmpBook.countTot);
+            printf("    %d %s\n        by %s\n        Total Count= %d\n\n", tmpBook.accession, tmpBook.title, tmpBook.author, tmpBook.countTot);
         }
         fclose(fp);
+        
+        flag=0;
     }
 
     mainAdminMenu();
