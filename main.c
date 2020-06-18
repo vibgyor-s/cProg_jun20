@@ -3,6 +3,9 @@
 #include <string.h>
 #include <time.h>
 
+
+
+
 typedef struct  //MAIN1
 {
     int accession; //?or char
