@@ -61,6 +61,7 @@ int main()
 //////////////////////////////////////////////////////////////////////////////
 void welcome(void)
 {
+    printf("\e[1;1H\e[2J"); //clearTerminal
     //////
     char todayDateStr[15];
     struct tm *timeinfo;
@@ -116,6 +117,8 @@ void welcome(void)
 
 int mainAdminMenu(void)
 {
+    printf("\e[1;1H\e[2J"); //clearTerminal
+
     printf("\nHi admin\n\n");
     printf("Enter 1 for inventory search:\nEnter 2 to place order/ILDRS\n");
     printf("Enter 3 to add/remove Books\nEnter 4 to add/remove Users\nEnter 7 to logout\n\n");
@@ -139,8 +142,11 @@ int mainAdminMenu(void)
         welcome();
     }
 }
+
 void addRemoveBooks(void)
 {
+    printf("\e[1;1H\e[2J"); //clearTerminal
+
     printf("Add/Remove Books Menu: \n\nWhat would you like to do?\n");
     printf("Enter 1 to add book\nEnter 2 to remove book\nEnter 7 to go back\n");
     int choice, flag = 1;
@@ -221,6 +227,8 @@ void addRemoveBooks(void)
 
 void addRemoveUsers(void)
 {
+    printf("\e[1;1H\e[2J"); //clearTerminal
+
     printf("Add/Remove Users Menu: \n\nWhat would you like to do?\n");
     printf("Enter 1 to add user\nEnter 2 to remove user\nEnter 7 to go back\n");
     int choice, flag = 1;
@@ -323,6 +331,8 @@ void addRemoveUsers(void)
 
 void inventory(void)
 {
+    printf("\e[1;1H\e[2J"); //clearTerminal
+    
     int choice = 0, flag = 1;
     printf("Book inventory menu: \n\n");
     printf("Enter 1 to view by accession no.\nEnter 2 to view all books\nEnter 7 to go back\n");
@@ -358,14 +368,18 @@ void inventory(void)
         }
         fclose(fp);
         
-        flag=0;
+        printf("Enter 1 to list again: ");
+        scanf("%d", &flag);
     }
 
+    
     mainAdminMenu();
 }
 
 void order(void) //TODO: MAKE THE TXT FILE READABLE
 {
+    printf("\e[1;1H\e[2J"); //clearTerminal
+    
     printf("Book order/request menu:\n\n");
     printf("Enter 1 to place vendor order\nEnter 2 to request book ILDRS\nEnter 7 to go back\n");
     int choice, flag = 1;
@@ -419,6 +433,8 @@ void order(void) //TODO: MAKE THE TXT FILE READABLE
 
 int mainUserMenu(void)
 {
+    printf("\e[1;1H\e[2J"); //clearTerminal
+    
     printf("Hi %s\n\n", username);
     user tmpUser;
     book tmpBook;
@@ -442,8 +458,9 @@ int mainUserMenu(void)
                     strftime(issueDate, strlen("DD-MMM-YYYY") + 1, "%d-%b-%Y", issueTime);
 
                     if (7 >= (difftime(rawtime, tmpUser.record[i].issue) / 86400))   //for red colour
-                            printf("");//red colour
+                            printf("\033[1;31m");//red colour
                     printf("    %d - %s", tmpUser.record[i].accession, issueDate);
+                    printf("\033[0m");  //reset colour
                 }
             }
         }
@@ -470,9 +487,10 @@ int mainUserMenu(void)
                             countBook = tmpBook.countAva;
                     }
 
-                    if (countBook > 0) //for red colour
-                        printf("");    //green colour
+                    if (countBook > 0)
+                        printf("\033[1;32m");    //green colour
                     printf("    %d - %s", tmpUser.record[i].accession, issueDate);
+                    printf("\033[0m");  //reset colour
                 }
             }
         }
@@ -500,30 +518,41 @@ int mainUserMenu(void)
 
 void search(void)
 {
+    printf("\e[1;1H\e[2J"); //clearTerminal
+    
     printf("OneBookSearch\n\n");
-    printf("Enter search query: (Esc. to go back) ");
+    printf("Enter search query: ");
     char search[40];
     scanf("%s", search);
-
+    printf("\n");
+    int flag=1;
+    
     FILE *fp;
     fp = fopen("bookMaster.txt", "r");
     book tmpBook;
 
-    while (fread(&tmpBook, sizeof(tmpBook), 1, fp) == 1)
+    while (flag == 1)
     {
-        char *pt;
-        if ((pt = strstr(tmpBook.catanatedSearch, search)) != NULL)
-            printf("    %d %s\n        by %s\n\n", tmpBook.accession, tmpBook.title, tmpBook.author);
-    }
-    fclose(fp);
+        while (fread(&tmpBook, sizeof(tmpBook), 1, fp) == 1)
+        {
+            char *pt;
+            if ((pt = strstr(tmpBook.catanatedSearch, search)) != NULL)
+                printf("    %d %s\n        by %s\n\n", tmpBook.accession, tmpBook.title, tmpBook.author);
+        }
+        fclose(fp);
 
-    printf("Pl note the accession no. to manage Book.\n");
+        printf("Pl note the accession no. to manage Book.\n");
+        printf("Enter 1 to continue search: ");
+        scanf("%d", &flag);
+    }
 
     mainUserMenu();
 }
 
 void bookManagement(void)
 {
+    printf("\e[1;1H\e[2J"); //clearTerminal
+    
     printf("Book issue/return and reserve/unreserve Menu:\n\n");
     printf("Enter 1 to issue/reserve book\nEnter 2 to return/unreserve book\nEnter 7 to go back\n");
     int choice, flag = 1;
