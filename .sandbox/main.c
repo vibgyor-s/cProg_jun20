@@ -111,6 +111,7 @@ void welcome(void)
                     mainUserMenu();
             }
         }
+        rewind(fs);
         fclose(fs);
     }
 }
@@ -192,17 +193,17 @@ void addRemoveBooks(void)
             if (tmpBook.accession == id)
             {
                 printf("\nTitle is: %s\n    by %s\nConfirm delete?y/n ", tmpBook.title, tmpBook.author);
-                scanf("%c", &confirm);
+                scanf(" %c", &confirm);
 
                 while ( (confirm == 'y') && (tmpBook.countTot == tmpBook.countAva) ) //check if no books of title are issued
                 {
                     FILE *ft;
                     ft = fopen("tempRemove.txt", "w+");
-                    rewind(fp); //initialise for loop
+                    rewind(fp); //initialise earlier file for loop
 
                     while (fread(&tmpBook, sizeof(tmpBook), 1, fp) == 1)
                     {
-                        if (tmpBook.accession == id)
+                        if (tmpBook.accession != id)
                         {
                             fseek(ft, 0, SEEK_CUR);
                             fwrite(&tmpBook, sizeof(tmpBook), 1, ft); //write temp file
@@ -244,7 +245,7 @@ void addRemoveUsers(void)
         printf("Password: ");
         scanf(" %[^\n]", tmpUser1.password);
 
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 5; i++)
         {
             tmpUser1.record[i].accession = 0;
             tmpUser1.record[i].type = 'n';
@@ -285,11 +286,12 @@ void addRemoveUsers(void)
         scanf("%d", &flag);
     }
 
-    while (choice == 2 && flag == 1)
+    while (choice == 2 && flag == 1)    //!Functionality check user has no issued books
     {
         char id[10];
         printf("\nEnter username to delete: ");
-        scanf("%s", id);
+        scanf("%s", &id);
+        char confirm;
 
         FILE *fp;
         user tmpUser;
@@ -300,8 +302,8 @@ void addRemoveUsers(void)
             if (!(strcmp(id, tmpUser.username)))
             {
                 printf("\nUsername is: %s\nConfirm delete?y/n ", tmpUser.username);
-                scanf("%c", &flag);
-                if (flag == 'y')
+                scanf(" %c", &confirm);
+                if (confirm == 'y')
                 {
                     FILE *ft;
                     ft = fopen("tempRemove.txt", "w+");
@@ -328,6 +330,8 @@ void addRemoveUsers(void)
         printf("Enter 1 to continue: ");
         scanf("%d", &flag);
     }
+    
+    mainAdminMenu();
 }
 
 void inventory(void)
@@ -537,16 +541,17 @@ void search(void)
         while (fread(&tmpBook, sizeof(tmpBook), 1, fp) == 1)
         {
             char *pt;
-            if ((pt = strstr(tmpBook.catanatedSearch, search)) != NULL)
-                printf("    %d %s\n        by %s\n\n", tmpBook.accession, tmpBook.title, tmpBook.author);
+            if ((pt = strcasestr(tmpBook.catanatedSearch, search)) != NULL)
+                printf("    \033[4m%d\033[0m %s\n        by %s\n\n", tmpBook.accession, tmpBook.title, tmpBook.author);
         }
         fclose(fp);
 
-        printf("Pl note the accession no. to manage Book.\n");
+        printf("Pl note the accession no. to manage Book.\n\n");
+
         printf("Enter 1 to continue search: ");
         scanf("%d", &flag);
     }
-
+    
     mainUserMenu();
 }
 
@@ -583,12 +588,12 @@ void bookManagement(void)
                 if (tmpBook.countAva > 0)
                 {
                     printf("Book avaliable. Issue? ");
-                    scanf("%c",&choice);
+                    scanf(" %c",&choice);
                 }
                 else
                 {
                     printf("Book not avaliable. Reserve? ");
-                    scanf("%c", &choice);
+                    scanf(" %c", &choice);
 
                     bookFlag = 0;
                 }
@@ -599,7 +604,7 @@ void bookManagement(void)
         {
             if (!(strcmp(username, tmpUser.username)))
             {
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 4; i++)
                 {
                     if (tmpUser.record[i].accession = 0)
                     {
@@ -611,7 +616,8 @@ void bookManagement(void)
                 break;
             }
         }
-
+        
+        ///////////
         rewind(fp);
         rewind(fs);
         if (choice == 'y' && avaFlag == 1)
