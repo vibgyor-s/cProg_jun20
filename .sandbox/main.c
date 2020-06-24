@@ -30,12 +30,12 @@ typedef struct //MAIN2
     bkRec record[5]; //max 5 books issued+reserved PROBLEMS?
 } user;
 
-typedef struct //MAIN3
-{
-    char title[40];
-    char ISBN[14];
-    int number;
-} vendor, ILDRS;
+// typedef struct //MAIN3
+// {
+//     char title[40];
+//     char ISBN[14];
+//     int number;
+// } vendor, ILDRS;
 
 void welcome(void);        //return- 0/1 according to user/admin   //!
 int mainAdminMenu(void);   //return-choice                         //!
@@ -43,9 +43,9 @@ void addRemoveBooks(void); //modify bookmaster.txt                 //!
 void addRemoveUsers(void); //modify usermaster.txt                 //!
 void inventory(void);      //list particular books and count       //!
 void order(void);          //append to orders.txt ILDRS.txt        //? display all orders inside program
-int mainUserMenu(void);    //return-choice                         //?
+int mainUserMenu(void);    //return-choice                         //!
 void search(void);         //main search and list                  //!
-void bookManagement(void); //issue-return
+void bookManagement(void); //issue-return                          //!
 
 //GLOBAL Var
 time_t rawtime;
@@ -390,48 +390,70 @@ void order(void) //TODO: MAKE THE TXT FILE READABLE
     int choice, flag = 1;
     scanf("%d", &choice);
 
-    while (choice == 1 && flag == 1) //flags to repeat
+    while (flag == 1) //flags to repeat
     {
-        printf("Vendor order:\n\n");
+        if(choice==1)
+            printf("Vendor order:\n\n");
+        else printf("ILDRS order:\n\n");
+
         FILE *fp;
-        fp = fopen("orders.txt", "a+");
-        vendor tmpOrder;
+        fp = fopen("ordersILDRS.csv", "a+");
+
+        char title[40],ISBN[14],to[80],type[10];
+        int noBooks;
+
+        if(choice==1)
+            strcpy(type, "Order");
+        else strcpy(type, "ILDRS");
+
         printf("Title: ");
-        scanf(" %[^\n]", tmpOrder.title);
+        scanf(" %[^\n]", title);
         printf("ISBN: ");
-        scanf(" %[^\n]", tmpOrder.ISBN);
+        scanf(" %[^\n]",ISBN);
         printf("Total Count: ");
-        scanf("%d", &tmpOrder.number);
-        fwrite(&tmpOrder, sizeof(tmpOrder), 1, fp);
+        scanf("%d", &noBooks);
+        printf("Request to: ");
+        scanf(" %[^\n]",to);
+
+        fprintf(fp,"\n%s,%s,%s,%d,%s",type,title,ISBN,noBooks,to);
+        
+        // vendor tmpOrder;
+        // printf("Title: ");
+        // scanf(" %[^\n]", tmpOrder.title);
+        // printf("ISBN: ");
+        // scanf(" %[^\n]", tmpOrder.ISBN);
+        // printf("Total Count: ");
+        // scanf("%d", &tmpOrder.number);
+        // fwrite(&tmpOrder, sizeof(tmpOrder), 1, fp);
         fclose(fp);
         printf("Saved successfully.\n");
 
         ////
-        printf("Enter 1 to continue: ");
+        printf("Enter 1 to continue, 7 to exit: ");
         scanf("%d", &flag);
     }
 
-    while (choice == 2 && flag == 2)
+    // while (choice == 2 && flag == 2)
 
-    {
-        printf("ILDRS order:\n\n");
-        FILE *fp;
-        fp = fopen("ILDRS.txt", "a+");
-        vendor tmpOrder;
-        printf("Title: ");
-        scanf(" %[^\n]", tmpOrder.title);
-        printf("ISBN: ");
-        scanf(" %[^\n]", tmpOrder.ISBN);
-        printf("Total Count: ");
-        scanf("%d", &tmpOrder.number);
-        fwrite(&tmpOrder, sizeof(tmpOrder), 1, fp);
-        fclose(fp);
-        printf("Saved successfully.\n");
+    // {
+    //     printf("ILDRS order:\n\n");
+    //     FILE *fp;
+    //     fp = fopen("ordersILDRS.csv", "a+");
+    //     // vendor tmpOrder;
+    //     // printf("Title: ");
+    //     // scanf(" %[^\n]", tmpOrder.title);
+    //     // printf("ISBN: ");
+    //     // scanf(" %[^\n]", tmpOrder.ISBN);
+    //     // printf("Total Count: ");
+    //     // scanf("%d", &tmpOrder.number);
+    //     // fwrite(&tmpOrder, sizeof(tmpOrder), 1, fp);
+    //     // fclose(fp);
+    //     // printf("Saved successfully.\n");
 
-        ////
-        printf("Enter 1 to continue: ");
-        scanf("%d", &flag);
-    }
+    //     ////
+    //     printf("Enter 1 to continue: ");
+    //     scanf("%d", &flag);
+    // }
 
     mainAdminMenu();
 }
@@ -463,7 +485,7 @@ int mainUserMenu(void)
                     strftime(issueDate, strlen("DD-MMM-YYYY") + 1, "%d-%b-%Y", issueTime);
                     ////////
                     
-                    if (7 <= (difftime(rawtime, tmpUser.record[i].issue) / 86400))   //for red colour
+                    if (15 <= (difftime(rawtime, tmpUser.record[i].issue) / 86400))   //for red colour
                         printf("\033[1;31m");//red colour
                     
                     printf("    Book no. %d - issued %s\n", tmpUser.record[i].accession, issueDate);
