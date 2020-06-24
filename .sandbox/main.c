@@ -180,7 +180,8 @@ void addRemoveBooks(void)
     {
         int id;
         printf("\nEnter accession no. to delete: ");
-        scanf("%d", id);
+        scanf("%d", &id);
+        char confirm;
 
         FILE *fp;
         book tmpBook;
@@ -191,9 +192,9 @@ void addRemoveBooks(void)
             if (tmpBook.accession == id)
             {
                 printf("\nTitle is: %s\n    by %s\nConfirm delete?y/n ", tmpBook.title, tmpBook.author);
-                scanf("%c", &flag);
+                scanf("%c", &confirm);
 
-                while (flag == 'y' && tmpBook.countTot == tmpBook.countAva) //check if no books of title are issued
+                while ( (confirm == 'y') && (tmpBook.countTot == tmpBook.countAva) ) //check if no books of title are issued
                 {
                     FILE *ft;
                     ft = fopen("tempRemove.txt", "w+");
@@ -208,7 +209,7 @@ void addRemoveBooks(void)
                         }
                     }
 
-                    flag = 'n';
+                    confirm = 'n';
                     fclose(ft);
                 }
             }
