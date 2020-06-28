@@ -27,18 +27,18 @@ typedef struct //MAIN2
 {
     char username[10];
     char password[10];
-    bkRec record[5]; //max 5 books issued+reserved 
+    bkRec record[5]; //max 5 books issued+reserved
 } user;
 
-void welcome(void);        //move on according to user/admin   
-int mainAdminMenu(void);   //return-choice                         
-void addRemoveBooks(void); //modify bookmaster.txt                 
-void addRemoveUsers(void); //modify usermaster.txt                 
-void inventory(void);      //list particular books and count       
-void order(void);          //append to ordersILDRS.csv        
-int mainUserMenu(void);    //return-choice                         
-void search(void);         //main search and list                  
-void bookManagement(void); //main issue-return                          
+void welcome(void);        //move on according to user/admin
+int mainAdminMenu(void);   //return-choice
+void addRemoveBooks(void); //modify bookmaster.txt
+void addRemoveUsers(void); //modify usermaster.txt
+void inventory(void);      //list particular books and count
+void order(void);          //append to ordersILDRS.csv
+int mainUserMenu(void);    //return-choice
+void search(void);         //main search and list
+void bookManagement(void); //main issue-return
 
 //GLOBAL Var
 time_t rawtime;
@@ -55,18 +55,19 @@ void welcome(void)
 {
     printf("\e[1;1H\e[2J"); //clearTerminal
     //////
-    char todayDateStr[15];  //for storing today's date
+    char todayDateStr[15]; //for storing today's date
     struct tm *timeinfo;
-    time(&rawtime);         //store current time
+    time(&rawtime); //store current time
     timeinfo = localtime(&rawtime);
-    strftime(todayDateStr, strlen("DD-MMM-YYYY") + 1, "%d-%b-%Y", timeinfo);    //convert current time to string
+    strftime(todayDateStr, strlen("DD-MMM-YYYY") + 1, "%d-%b-%Y", timeinfo); //convert current time to string
     //////
 
-    printf("			**_Welcome to the library_**      		 \n\n");    printf("Today is %s\n", todayDateStr); //todays date
+    printf("			**_Welcome to the library_**      		 \n\n");
+    printf("Today is %s\n", todayDateStr); //todays date
     printf("New additions of the week: \n\n");
 
     //List new books added in last 7 days
-    FILE *fp;                                   
+    FILE *fp;
     fp = fopen("bookMaster.txt", "r");
     book tmpBook;
     while (fread(&tmpBook, sizeof(tmpBook), 1, fp) == 1)
@@ -99,7 +100,7 @@ void welcome(void)
                 flag = 0;
                 sleep(1);
 
-                if (!(strcmp(username, "admin")))   //Admin and user differentiate
+                if (!(strcmp(username, "admin"))) //Admin and user differentiate
                     mainAdminMenu();
                 else
                     mainUserMenu();
@@ -110,7 +111,7 @@ void welcome(void)
     }
 }
 
-int mainAdminMenu(void)     //Main menu for admin uses
+int mainAdminMenu(void) //Main menu for admin uses
 {
     printf("\e[1;1H\e[2J"); //clearTerminal
 
@@ -139,7 +140,7 @@ int mainAdminMenu(void)     //Main menu for admin uses
     }
 }
 
-void addRemoveBooks(void)   //handling addition or removal of books
+void addRemoveBooks(void) //handling addition or removal of books
 {
     printf("\e[1;1H\e[2J"); //clearTerminal
 
@@ -155,18 +156,18 @@ void addRemoveBooks(void)   //handling addition or removal of books
         ////
         book tmpBook;
         printf("Enter data:\n");
-        tmpBook.accession = latestAccessionNo();    //Assign latest accessionNo.
+        tmpBook.accession = latestAccessionNo(); //Assign latest accessionNo.
         printf("Title: ");
         scanf(" %[^\n]", tmpBook.title);
         printf("Author: ");
         scanf(" %[^\n]", tmpBook.author);
-        printf("Total Count: "); 
+        printf("Total Count: ");
         scanf("%d", &tmpBook.countTot);
         tmpBook.countAva = tmpBook.countTot;
         tmpBook.order = rawtime;
         //Create special catanated string for search purpose
         snprintf(tmpBook.catanatedSearch, 127, "%s_%s_%d", tmpBook.title, tmpBook.author, tmpBook.accession);
-        
+
         fwrite(&tmpBook, sizeof(tmpBook), 1, fp);
         fclose(fp);
         printf("			**Saved successfully**			 \n");
@@ -175,7 +176,7 @@ void addRemoveBooks(void)   //handling addition or removal of books
         scanf("%d", &flag);
     }
 
-    while (choice == 2 && flag == 1)    //REMOVE BOOK   
+    while (choice == 2 && flag == 1) //REMOVE BOOK
     {
         int id;
         printf("\nEnter accession no. to delete: ");
@@ -185,7 +186,7 @@ void addRemoveBooks(void)   //handling addition or removal of books
         FILE *fp;
         book tmpBook;
         fp = fopen("bookMaster.txt", "r+");
-        
+
         while ((fread(&tmpBook, sizeof(tmpBook), 1, fp)) == 1)
         {
             if (tmpBook.accession == id)
@@ -193,7 +194,7 @@ void addRemoveBooks(void)   //handling addition or removal of books
                 printf("\nTitle is: %s\n    by %s\nConfirm delete?y/n ", tmpBook.title, tmpBook.author);
                 scanf(" %c", &confirm);
 
-                while ( (confirm == 'y') && (tmpBook.countTot == tmpBook.countAva) ) //check if no books of title are issued
+                while ((confirm == 'y') && (tmpBook.countTot == tmpBook.countAva)) //check if no books of title are issued
                 {
                     FILE *ft;
                     ft = fopen("tempRemove.txt", "w+");
@@ -226,7 +227,7 @@ void addRemoveBooks(void)   //handling addition or removal of books
     mainAdminMenu();
 }
 
-void addRemoveUsers(void)   //handling addition or removal of users
+void addRemoveUsers(void) //handling addition or removal of users
 {
     printf("\e[1;1H\e[2J"); //clearTerminal
 
@@ -238,14 +239,14 @@ void addRemoveUsers(void)   //handling addition or removal of users
     while (choice == 1 && flag == 1) //flags to repeat
     {
 
-        user tmpUser1, tmpUser2;    //1 for input 2 for
+        user tmpUser1, tmpUser2; //1 for input 2 for
         printf("Enter data:\n");
         printf("Username: ");
         scanf(" %[^\n]", tmpUser1.username);
         printf("Password: ");
         scanf(" %[^\n]", tmpUser1.password);
 
-        for (int i = 0; i < 5; i++)     //Initialise user records
+        for (int i = 0; i < 5; i++) //Initialise user records
         {
             tmpUser1.record[i].accession = 0;
             tmpUser1.record[i].type = 'n';
@@ -260,11 +261,9 @@ void addRemoveUsers(void)   //handling addition or removal of users
             {
                 printf("User exists! Assigning new password.\n"); //Functionality to change password
 
-                fseek(fp, ftell(fp) - sizeof(tmpUser2), 0); 
+                fseek(fp, ftell(fp) - sizeof(tmpUser2), 0);
                 fwrite(&tmpUser1, sizeof(tmpUser2), 1, fp);
-                
             }
-            
         }
 
         fclose(fp);
@@ -281,16 +280,16 @@ void addRemoveUsers(void)   //handling addition or removal of users
         scanf("%d", &flag);
     }
 
-    while (choice == 2 && flag == 1)    //!DOESNT check if user has issued books
+    while (choice == 2 && flag == 1) //!DOESNT check if user has issued books
     {
         char id[10];
         printf("\nEnter username to delete: ");
         scanf("%s", id);
-        
+
         char confirm;
         FILE *fp;
         user tmpUser;
-        
+
         fp = fopen("userMaster.txt", "r+");
         while ((fread(&tmpUser, sizeof(tmpUser), 1, fp)) == 1)
         {
@@ -301,8 +300,8 @@ void addRemoveUsers(void)   //handling addition or removal of users
                 if (confirm == 'y')
                 {
                     FILE *ft;
-                    ft = fopen("tempRemove.txt", "w+");     //create temp file 
-                    rewind(fp); //initialise for loop
+                    ft = fopen("tempRemove.txt", "w+"); //create temp file
+                    rewind(fp);                         //initialise for loop
                     while (fread(&tmpUser, sizeof(tmpUser), 1, fp) == 1)
                     {
                         if (strcmp(tmpUser.username, id))
@@ -325,14 +324,14 @@ void addRemoveUsers(void)   //handling addition or removal of users
         printf("Enter 1 to remove more,7for back: ");
         scanf("%d", &flag);
     }
-    
+
     mainAdminMenu();
 }
 
 void inventory(void)
 {
     printf("\e[1;1H\e[2J"); //clearTerminal
-    
+
     int choice = 0, flag = 1;
     printf("			**Welcome to Book inventory menu**			 \n\n");
     printf("Enter 1 to view by accession no.\nEnter 2 to view all books\nEnter 7 to go back\n\n");
@@ -346,7 +345,7 @@ void inventory(void)
         FILE *fp;
         fp = fopen("bookMaster.txt", "r");
         book tmpBook;
-        while (fread(&tmpBook, sizeof(tmpBook), 1, fp) == 1)    //running loop until EOF
+        while (fread(&tmpBook, sizeof(tmpBook), 1, fp) == 1) //running loop until EOF
         {
             if (tmpBook.accession == input) //if accession matches
                 printf("    %d %s\n        by %s    Total Count= %d\n\n", tmpBook.accession, tmpBook.title, tmpBook.author, tmpBook.countTot);
@@ -357,7 +356,7 @@ void inventory(void)
         scanf("%d", &flag);
     }
 
-    while (choice == 2 && flag == 1)    //View all books
+    while (choice == 2 && flag == 1) //View all books
     {
         printf("Listing all books: \n\n");
         FILE *fp;
@@ -368,19 +367,18 @@ void inventory(void)
             printf("    %d %s\n        by %s\n        Total Count= %d\n\n", tmpBook.accession, tmpBook.title, tmpBook.author, tmpBook.countTot);
         }
         fclose(fp);
-        
+
         printf("Enter 1 to list again, 7 for back: ");
         scanf("%d", &flag);
     }
 
-    
     mainAdminMenu();
 }
 
-void order(void) 
+void order(void)
 {
     printf("\e[1;1H\e[2J"); //clearTerminal
-    
+
     printf("			**Book order/request menu**				\n\n");
     printf("Enter 1 to place vendor order\nEnter 2 to request book ILDRS\nEnter 7 to go back\n\n");
     int choice, flag = 1;
@@ -388,31 +386,33 @@ void order(void)
 
     while (flag == 1) //flags to repeat
     {
-        if(choice==1)
+        if (choice == 1)
             printf("Vendor order:\n\n");
-        else printf("ILDRS order:\n\n");
+        else
+            printf("ILDRS order:\n\n");
 
         FILE *fp;
-        fp = fopen("ordersILDRS.csv", "a+");    //opening csv file
+        fp = fopen("ordersILDRS.csv", "a+"); //opening csv file
 
-        char title[40],ISBN[14],to[80],type[10];
+        char title[40], ISBN[14], to[80], type[10];
         int noBooks;
 
-        if(choice==1)
+        if (choice == 1)
             strcpy(type, "Order");
-        else strcpy(type, "ILDRS");
+        else
+            strcpy(type, "ILDRS");
 
         printf("Title: ");
         scanf(" %[^\n]", title);
         printf("ISBN: ");
-        scanf(" %[^\n]",ISBN);
+        scanf(" %[^\n]", ISBN);
         printf("Total Count: ");
         scanf("%d", &noBooks);
         printf("Request to: ");
-        scanf(" %[^\n]",to);
+        scanf(" %[^\n]", to);
 
-        fprintf(fp,"\n%s,%s,%s,%d,%s",type,title,ISBN,noBooks,to);  //print in csv format
-        
+        fprintf(fp, "\n%s,%s,%s,%d,%s", type, title, ISBN, noBooks, to); //print in csv format
+
         fclose(fp);
         printf("Saved successfully.\n");
 
@@ -427,9 +427,9 @@ void order(void)
 int mainUserMenu(void)
 {
     printf("\e[1;1H\e[2J"); //clearTerminal
-    
+
     printf("        Hi %s\n\n", username);
-    user tmpUser;   //initialise variables
+    user tmpUser; //initialise variables
     book tmpBook;
     FILE *fp;
 
@@ -445,17 +445,17 @@ int mainUserMenu(void)
         {
             for (int i = 0; i < 5; i++)
             {
-                if ((tmpUser.record[i].accession != 0) && tmpUser.record[i].type =='i')
+                if ((tmpUser.record[i].accession != 0) && tmpUser.record[i].type == 'i')
                 {
                     issueTime = localtime(&tmpUser.record[i].issue);
                     strftime(issueDate, strlen("DD-MMM-YYYY") + 1, "%d-%b-%Y", issueTime);
                     ////////
-                    
-                    if (15 <= (difftime(rawtime, tmpUser.record[i].issue) / 86400))   //If time difference is more than 15 days
-                        printf("\033[1;31m");//red colour
-                    
+
+                    if (15 <= (difftime(rawtime, tmpUser.record[i].issue) / 86400)) //If time difference is more than 15 days
+                        printf("\033[1;31m");                                       //red colour
+
                     printf("    Book no. %d - issued %s\n", tmpUser.record[i].accession, issueDate);
-                    printf("\033[0m");  //reset colour
+                    printf("\033[0m"); //reset colour
                 }
             }
         }
@@ -472,55 +472,54 @@ int mainUserMenu(void)
         {
             for (int i = 0; i < 5; i++)
             {
-                if ((tmpUser.record[i].accession != 0) && tmpUser.record[i].type == 'r')    //if book is reserved
+                if ((tmpUser.record[i].accession != 0) && tmpUser.record[i].type == 'r') //if book is reserved
                 {
                     int countBook;
                     rewind(fs);
                     while (fread(&tmpBook, sizeof(tmpBook), 1, fs))
                     {
-                        if (tmpUser.record[i].accession == tmpBook.accession)   //note avaliable count of book
+                        if (tmpUser.record[i].accession == tmpBook.accession) //note avaliable count of book
                             countBook = tmpBook.countAva;
                     }
 
-                    if (countBook > 0)      //if book is avaliable
-                        printf("\033[1;32m");    //green colour
+                    if (countBook > 0)        //if book is avaliable
+                        printf("\033[1;32m"); //green colour
                     printf("    Book no. %d - reserved %s\n", tmpUser.record[i].accession, issueDate);
-                    printf("\033[0m");  //reset colour
+                    printf("\033[0m"); //reset colour
                 }
             }
         }
     }
 
-    
     printf("\nEnter 1 to search for a book:\nEnter 2 to issue/return\nEnter 7 to logout\n\n");
     int choice;
     scanf("%d", &choice);
 
     switch (choice)
     {
-        case 1:
-            search();
-            break;
-        case 2:
-            bookManagement();
-            break;
-        default:
-            welcome();
+    case 1:
+        search();
+        break;
+    case 2:
+        bookManagement();
+        break;
+    default:
+        welcome();
     }
 }
 
 void search(void)
 {
     printf("\e[1;1H\e[2J"); //clearTerminal
-    
-    printf("			**OneBookSearch**			\n\n");
+
+    printf("			**OneBookSearch**			\n\n       Search by Book title/Author/AccessionNo.\n\n");
 
     printf("Enter search query: ");
     char search[40];
     scanf("%s", search);
     printf("\n");
-    int flag=1;
-    
+    int flag = 1,result=0;
+
     FILE *fp;
     fp = fopen("bookMaster.txt", "r");
     book tmpBook;
@@ -530,30 +529,34 @@ void search(void)
         while (fread(&tmpBook, sizeof(tmpBook), 1, fp) == 1)
         {
             char *pt;
-            if ((pt = strcasestr(tmpBook.catanatedSearch, search)) != NULL)     //Do a case insensitive search
-                printf("    \033[4m%d\033[0m %s\n        by %s\n\n", tmpBook.accession, tmpBook.title, tmpBook.author); //Underline the accession number
+            if ((pt = strcasestr(tmpBook.catanatedSearch, search)) != NULL)                                             //Do a case insensitive search
+                {printf("    \033[4m%d\033[0m %s\n        by %s\n\n", tmpBook.accession, tmpBook.title, tmpBook.author); //Underline the accession number
+                result=1;}
         }
         fclose(fp);
 
-        printf("Pl note the accession no. to manage Book.\n\n");
+        if(result==0)
+            printf("No result found.\n");
+
+        printf("\033[4mPl note the accession no. to manage Book.\033[0m\n\n");
 
         printf("Enter 1 to continue search,7 to go back: ");
         scanf("%d", &flag);
     }
-    
+
     mainUserMenu();
 }
 
 void bookManagement(void)
 {
     printf("\e[1;1H\e[2J"); //clearTerminal
-    
+
     printf("			**Book issue/return and reserve/unreserve Menu**			\n\n");
     printf("Enter 1 to issue/reserve book\nEnter 2 to return/unreserve book\nEnter 7 to go back\n\n");
     int choice, flag = 1;
     scanf("%d", &choice);
 
-    while (choice == 1 && flag == 1)    //Issue reserve
+    while (choice == 1 && flag == 1) //Issue reserve
     {
         printf("\n  Issue / Reserve Menu:\n\n");
         printf("Enter accession no.: ");
@@ -567,17 +570,17 @@ void bookManagement(void)
         fs = fopen("userMaster.txt", "r+");
 
         int arrayPos = 0, avaFlag = 1, bookFlag = 1;
-        char choice='y';
+        char choice = 'y';
 
-        book tmpBook;       //CHECK BOOK AVALIABLITY
-        while (fread(&tmpBook, sizeof(tmpBook), 1, fp)) 
+        book tmpBook; //CHECK BOOK AVALIABLITY
+        while (fread(&tmpBook, sizeof(tmpBook), 1, fp))
         {
             if (accNo == tmpBook.accession)
             {
                 if (tmpBook.countAva > 0)
                 {
                     printf("Book avaliable. Issue? ");
-                    scanf(" %c",&choice);
+                    scanf(" %c", &choice);
                 }
                 else
                 {
@@ -589,48 +592,47 @@ void bookManagement(void)
             }
         }
 
-        user tmpUser;       //CHECK IF USER HAS FREE SPACE return empty array space
+        user tmpUser; //CHECK IF USER HAS FREE SPACE return empty array space
         while (fread(&tmpUser, sizeof(tmpUser), 1, fs))
         {
             if (!(strcmp(username, tmpUser.username)))
             {
                 for (int i = 0; i < 5; i++)
                 {
-                                      
+
                     if (tmpUser.record[i].accession == 0)
                     {
-                        
+
                         avaFlag = 1;
                         break;
                     }
                     arrayPos++;
                 }
-                
             }
         }
-        
+
         ///////////
         rewind(fp); //reset file filepointers
         rewind(fs);
 
-        if (choice == 'y' && avaFlag == 1)      
+        if (choice == 'y' && avaFlag == 1)
         {
-            while (fread(&tmpBook, sizeof(tmpBook), 1, fp) == 1)    //Decrease Avaliable Book count
+            while (fread(&tmpBook, sizeof(tmpBook), 1, fp) == 1) //Decrease Avaliable Book count
             {
                 if (tmpBook.accession == accNo)
                 {
                     if (tmpBook.countAva > 0)
                     {
-                        
+
                         tmpBook.countAva--;
-                        
-                        fseek(fp, ftell(fp) - sizeof(tmpBook), 0);  //Update By overwriting previous structure
+
+                        fseek(fp, ftell(fp) - sizeof(tmpBook), 0); //Update By overwriting previous structure
                         fwrite(&tmpBook, sizeof(tmpBook), 1, fp);
                     }
                 }
             }
 
-            while (fread(&tmpUser, sizeof(tmpUser), 1, fs) == 1)    //Record book in User record
+            while (fread(&tmpUser, sizeof(tmpUser), 1, fs) == 1) //Record book in User record
             {
                 if (!(strcmp(tmpUser.username, username)))
                 {
@@ -654,8 +656,8 @@ void bookManagement(void)
         printf("Enter 1 to issue more,7 to go back: ");
         scanf("%d", &flag);
     }
-    
-    while (choice == 2 && flag == 1)    //Return unreserve
+
+    while (choice == 2 && flag == 1) //Return unreserve
     {
         printf("Enter accession no.: ");
         int accNo;
@@ -670,7 +672,7 @@ void bookManagement(void)
         int arrayPos = 0, avaFlag = 0, bookFlag = 1;
         char choice;
 
-        user tmpUser;   //reset book record and overwrite structure
+        user tmpUser; //reset book record and overwrite structure
         while (fread(&tmpUser, sizeof(tmpUser), 1, fs))
         {
             if (!(strcmp(username, tmpUser.username)))
@@ -679,9 +681,9 @@ void bookManagement(void)
                 {
                     if (tmpUser.record[i].accession == accNo)
                     {
-                        if(tmpUser.record[i].type == 'r')   //note if book was reserved
-                            bookFlag=0;
-                        
+                        if (tmpUser.record[i].type == 'r') //note if book was reserved
+                            bookFlag = 0;
+
                         tmpUser.record[i].accession = 0;
                         tmpUser.record[i].type = 'n';
                         tmpUser.record[i].issue = rawtime;
@@ -689,29 +691,28 @@ void bookManagement(void)
                         fseek(fs, ftell(fs) - sizeof(tmpUser), 0);
                         fwrite(&tmpUser, sizeof(tmpUser), 1, fs);
 
-                        avaFlag = 1;    //note if book was returned
+                        avaFlag = 1; //note if book was returned
                         break;
                     }
-                    
                 }
             }
         }
 
         //Increment avaliable book count if issued book was returned
         book tmpBook;
-        while (fread(&tmpBook, sizeof(tmpBook), 1, fp)) 
+        while (fread(&tmpBook, sizeof(tmpBook), 1, fp))
         {
             if (accNo == tmpBook.accession && avaFlag == 1)
             {
                 if (bookFlag)
                     tmpBook.countAva++;
-                
+
                 fseek(fp, ftell(fp) - sizeof(tmpBook), 0);
                 fwrite(&tmpBook, sizeof(tmpBook), 1, fp);
             }
         }
 
-        if(avaFlag == 1)
+        if (avaFlag == 1)
             printf("			**Book returned**			\n");
 
         fclose(fp);
